@@ -17,23 +17,6 @@ def load_data(directory, input_shape, batch_size, color_mode = "rgb", class_name
             validation_dataset (tf.keras.Dataset): a dataset which has the validation points and their labels
             
     """
-    # dataset = tf.keras.preprocessing.image_dataset_from_directory(
-    #     directory,
-    #     labels="inferred",
-    #     label_mode= "int",
-    #     class_names= class_names,
-    #     color_mode= color_mode,
-    #     batch_size= batch_size,
-    #     image_size= (input_shape[0], input_shape[1]),
-    #     shuffle= True,
-    #     seed= None,
-    #     validation_split= None,
-    #     subset= None,
-    #     interpolation= "bilinear",
-    #     follow_links= False,
-    #     crop_to_aspect_ratio= False,
-    # )
-
     image_generator = tf.keras.preprocessing.image.ImageDataGenerator(validation_split=0.2)    
 
     training_dataset = image_generator.flow_from_directory(batch_size=batch_size,
