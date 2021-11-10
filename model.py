@@ -43,36 +43,37 @@ class DistractedDriverDetector():
         self.model.add(tf.keras.layers.InputLayer(input_shape = self.input_shape))
         
         # Conv Block 1
-        self.model.add(tf.keras.layers.Conv2D(filters= 64, kernel_size=(3,3), padding="valid", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 128, kernel_size=(5,5), padding="valid", activation= "relu"))
         self.model.add(tf.keras.layers.MaxPool2D(pool_size= (2,2)))
         self.model.add(tf.keras.layers.BatchNormalization())
-        self.model.add(tf.keras.layers.Dropout(0.2))
+        self.model.add(tf.keras.layers.Dropout(0.1))
 
         # Conv Block 2
-        self.model.add(tf.keras.layers.Conv2D(filters= 32, kernel_size=(3,3), padding="valid", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 32, kernel_size=(5,5), padding="valid", activation= "relu"))
         self.model.add(tf.keras.layers.MaxPool2D(pool_size= (2,2)))
-        self.model.add(tf.keras.layers.BatchNormalization())
-        self.model.add(tf.keras.layers.Dropout(0.2))        
+        #self.model.add(tf.keras.layers.BatchNormalization())
+        self.model.add(tf.keras.layers.Dropout(0.1))        
 
         # Conv Block 3
-        self.model.add(tf.keras.layers.Conv2D(filters= 16, kernel_size=(3,3), padding="valid", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 32, kernel_size=(3,3), padding="valid", activation= "relu"))
         self.model.add(tf.keras.layers.MaxPool2D(pool_size= (2,2)))
-        self.model.add(tf.keras.layers.BatchNormalization())
-        self.model.add(tf.keras.layers.Dropout(0.2))
+        #self.model.add(tf.keras.layers.BatchNormalization())
+        self.model.add(tf.keras.layers.Dropout(0.1))
 
         # Conv Block 4
-        self.model.add(tf.keras.layers.Conv2D(filters= 8, kernel_size=(3,3), padding="valid", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 16, kernel_size=(3,3), padding="valid", activation= "relu"))
         self.model.add(tf.keras.layers.MaxPool2D(pool_size= (2,2)))
-        self.model.add(tf.keras.layers.BatchNormalization())
-        self.model.add(tf.keras.layers.Dropout(0.2))
+        #self.model.add(tf.keras.layers.BatchNormalization())
+        #self.model.add(tf.keras.layers.Dropout(0.4))
 
         # Fully Connected Layers
         self.model.add(tf.keras.layers.Flatten())
         self.model.add(tf.keras.layers.Dense(64, activation= "relu"))
-        self.model.add(tf.keras.layers.Dense(32))
-        self.model.add(tf.keras.layers.Dense(self.num_classes))
+        self.model.add(tf.keras.layers.Dense(64, activation= "relu"))
+        self.model.add(tf.keras.layers.Dense(32, activation= "relu"))
+        self.model.add(tf.keras.layers.Dense(self.num_classes, activation='softmax'))
 
-        self.model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits= True), metrics=['accuracy'])
+        self.model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
     def train(self, epochs):
         """
@@ -82,7 +83,7 @@ class DistractedDriverDetector():
             returns:
                 Function call that returns History object that has metrics evolution throughout epochs
         """
-        return self.model.fit(self.training_dataset, epochs= epochs, validation_data = self.validation_dataset)    
+        return self.model.fit(self.training_dataset, epochs= epochs)    
 
     def save_model(self, model_save_path):
         """
@@ -92,7 +93,7 @@ class DistractedDriverDetector():
             returns:
                 None
         """
-        self.model.save(model_save_path + "distracted_driver_detector_v1.ckpt", overwrite= True)
+        self.model.save(model_save_path + "distracted_driver_detector_v3.ckpt", overwrite= True)
 
     def get_model(self) -> tf.keras.Sequential:
         return self.model

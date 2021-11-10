@@ -9,10 +9,13 @@ if __name__ == "__main__":
 
     # Argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", default= "models/distracted_driver_detector_v1") 
+    parser.add_argument("--model_path", default= "models/distracted_driver_detector_v3") 
     parser.add_argument("--folder", default=None)
     parser.add_argument("--camera", default=None, type= int)
+    parser.add_argument("--image", default=None)
     args = parser.parse_args()
+
+    input_shape = (320, 240)
 
     class_names = ["c0 Safe driving", "c1 Texting (right hand)", "c2 Talking on the phone (right hand)", "c3 Texting (left hand)",
         "c4 Talking on the phone (left hand)", "c5 Operating the radio", "c6 Drinking", "c7 Reaching behind", "c8 Hair and makeup", 
@@ -27,8 +30,8 @@ if __name__ == "__main__":
     model.load_weights(args.model_path+ ".h5")
     print("Loaded model from disk")
 
-    if args.camera == None and args.folder == None:
-        raise RuntimeError("Please specify the input to either being from a folder or a camera")
+    if args.camera == None and args.folder == None and args.image == None:
+        raise RuntimeError("Please specify the input to either being from a folder, camera, or image.")
     
     if not args.camera == None:
         cap = cv2.VideoCapture(args.camera)
@@ -36,22 +39,39 @@ if __name__ == "__main__":
             tic = time.time()
             ret, frame = cap.read()
             if ret == True:
-                frame_resized = cv2.resize(frame, (128, 128))
-                input = frame_resized.reshape(1, 128, 128, 3)
+                frame_resized = cv2.resize(frame, (input_shape[0], input_shape[1]))
+                frame_resized_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
+                input = frame_resized_rgb.reshape(1, input_shape[0], input_shape[1], 3)
                 predictions = model.predict(input)
                 pred_label = np.argmax(predictions)
 
                 print("Predicted Driver Status: {}".format(class_names[pred_label]))
                 cv2.imshow("input frame", frame_resized)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
+                    break
 
             toc = time.time()
             print("Inference Time: {}s".format(toc-tic))
             print("FPS: {}s".format(1/(toc-tic)))
+    
+    elif not args.image == None:
+        frame = cv2.imread(args.image)
+        tic = time.time()
+        frame_resized = cv2.resize(frame, (input_shape[0], input_shape[1]))
+        frame_resized_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
+        input = frame_resized_rgb.reshape(1, input_shape[0], input_shape[1], 3)
+        predictions = model.predict(input)
+        print(predictions)
+        pred_label = np.argmax(predictions)
+
+        print("Predicted Driver Status: {}".format(class_names[pred_label]))
+        cv2.imshow("input frame", frame_resized)
+    
+        toc = time.time()
+        print("Inference Time: {}s".format(toc-tic))
+        cv2.waitKey(0)
             
 
-    
     elif not args.folder == None:
         raise NotImplementedError("Still under development!")
  

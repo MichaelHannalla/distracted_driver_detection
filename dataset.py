@@ -1,8 +1,5 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow._api.v2 import data
-from tensorflow.python.ops.gen_batch_ops import batch
-
 
 def load_data(directory, input_shape, batch_size, color_mode = "rgb", class_names= None):
     """
@@ -17,6 +14,18 @@ def load_data(directory, input_shape, batch_size, color_mode = "rgb", class_name
             validation_dataset (tf.keras.Dataset): a dataset which has the validation points and their labels
             
     """
+
+    return tf.keras.preprocessing.image_dataset_from_directory(
+        directory,
+        labels="inferred",
+        label_mode="int",
+        class_names=None,
+        color_mode="grayscale",
+        batch_size= batch_size,
+        image_size= (input_shape[0], input_shape[1]),
+        shuffle= True,
+    )
+
     image_generator = tf.keras.preprocessing.image.ImageDataGenerator(validation_split=0.2)    
 
     training_dataset = image_generator.flow_from_directory(batch_size=batch_size,
