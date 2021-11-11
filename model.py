@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf 
+from keras.applications.vgg16 import VGG16
 
 class DistractedDriverDetector():
     def __init__(self) -> None:
@@ -43,34 +44,61 @@ class DistractedDriverDetector():
         self.model.add(tf.keras.layers.InputLayer(input_shape = self.input_shape))
         
         # Conv Block 1
-        self.model.add(tf.keras.layers.Conv2D(filters= 128, kernel_size=(5,5), padding="valid", activation= "relu"))
-        self.model.add(tf.keras.layers.MaxPool2D(pool_size= (2,2)))
+        self.model.add(tf.keras.layers.Conv2D(filters= 64, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 64, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.MaxPool2D(pool_size= 2, strides=2, padding="same"))
         self.model.add(tf.keras.layers.BatchNormalization())
         self.model.add(tf.keras.layers.Dropout(0.1))
 
         # Conv Block 2
-        self.model.add(tf.keras.layers.Conv2D(filters= 32, kernel_size=(5,5), padding="valid", activation= "relu"))
-        self.model.add(tf.keras.layers.MaxPool2D(pool_size= (2,2)))
-        #self.model.add(tf.keras.layers.BatchNormalization())
+        self.model.add(tf.keras.layers.Conv2D(filters= 128, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 128, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.MaxPool2D(pool_size= 2, strides= 2, padding="same"))
+        self.model.add(tf.keras.layers.BatchNormalization())
         self.model.add(tf.keras.layers.Dropout(0.1))        
 
         # Conv Block 3
-        self.model.add(tf.keras.layers.Conv2D(filters= 32, kernel_size=(3,3), padding="valid", activation= "relu"))
-        self.model.add(tf.keras.layers.MaxPool2D(pool_size= (2,2)))
-        #self.model.add(tf.keras.layers.BatchNormalization())
+        self.model.add(tf.keras.layers.Conv2D(filters= 256, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 256, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 256, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.MaxPool2D(pool_size= 2, strides= 2, padding="same"))
+        self.model.add(tf.keras.layers.BatchNormalization())
         self.model.add(tf.keras.layers.Dropout(0.1))
 
         # Conv Block 4
-        self.model.add(tf.keras.layers.Conv2D(filters= 16, kernel_size=(3,3), padding="valid", activation= "relu"))
-        self.model.add(tf.keras.layers.MaxPool2D(pool_size= (2,2)))
-        #self.model.add(tf.keras.layers.BatchNormalization())
-        #self.model.add(tf.keras.layers.Dropout(0.4))
+        self.model.add(tf.keras.layers.Conv2D(filters= 512, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 512, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 512, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.MaxPool2D(pool_size= 2, strides= 2, padding="same"))
+        self.model.add(tf.keras.layers.BatchNormalization())
+        self.model.add(tf.keras.layers.Dropout(0.1))
+
+        # Conv Block 5
+        self.model.add(tf.keras.layers.Conv2D(filters= 512, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 512, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.Conv2D(filters= 512, kernel_size=3, padding="same", activation= "relu"))
+        self.model.add(tf.keras.layers.MaxPool2D(pool_size= 2, strides= 2, padding="same"))
+        self.model.add(tf.keras.layers.BatchNormalization())
+        self.model.add(tf.keras.layers.Dropout(0.1))
 
         # Fully Connected Layers
         self.model.add(tf.keras.layers.Flatten())
-        self.model.add(tf.keras.layers.Dense(64, activation= "relu"))
-        self.model.add(tf.keras.layers.Dense(64, activation= "relu"))
-        self.model.add(tf.keras.layers.Dense(32, activation= "relu"))
+        
+        self.model.add(tf.keras.layers.Dense(2048, activation= "relu", 
+                kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-5, l2=1e-4),
+                bias_regularizer=tf.keras.regularizers.l2(1e-4),
+                activity_regularizer=tf.keras.regularizers.l2(1e-5)))
+        
+        self.model.add(tf.keras.layers.Dense(2048, activation= "relu", 
+                kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-5, l2=1e-4),
+                bias_regularizer=tf.keras.regularizers.l2(1e-4),
+                activity_regularizer=tf.keras.regularizers.l2(1e-5)))
+
+        self.model.add(tf.keras.layers.Dense(2048, activation= "relu", 
+                kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-5, l2=1e-4),
+                bias_regularizer=tf.keras.regularizers.l2(1e-4),
+                activity_regularizer=tf.keras.regularizers.l2(1e-5)))
+
         self.model.add(tf.keras.layers.Dense(self.num_classes, activation='softmax'))
 
         self.model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
@@ -93,7 +121,7 @@ class DistractedDriverDetector():
             returns:
                 None
         """
-        self.model.save(model_save_path + "distracted_driver_detector_v3.ckpt", overwrite= True)
+        self.model.save(model_save_path + "distracted_driver_detector_v5.ckpt", overwrite= True)
 
     def get_model(self) -> tf.keras.Sequential:
         return self.model

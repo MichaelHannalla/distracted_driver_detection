@@ -7,14 +7,14 @@ if __name__ == "__main__":
 
     # Argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset_path", default= "state-farm-distracted-driver-detection/imgs/train") 
+    parser.add_argument("--dataset_path", default= "state-farm-distracted-driver-detection/imgs/train/") 
     parser.add_argument("--model_save_path", default= "models/")
-    parser.add_argument("--batch_size", default=8, type= int)
-    parser.add_argument("--epochs", default=10, type= int)
+    parser.add_argument("--batch_size", default=4, type= int)
+    parser.add_argument("--epochs", default=5, type= int)
     args = parser.parse_args()
 
     # Load the dataset
-    input_shape = (320, 240, 1) 
+    input_shape = (240, 320, 3) 
     batch_size = args.batch_size
     class_names = ["c0 Safe driving", "c1 Texting (right hand)", "c2 Talking on the phone (right hand)", "c3 Texting (left hand)",
         "c4 Talking on the phone (left hand)", "c5 Operating the radio", "c6 Drinking", "c7 Reaching behind", "c8 Hair and makeup", 

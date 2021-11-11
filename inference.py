@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     # Argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", default= "models/distracted_driver_detector_v3") 
+    parser.add_argument("--model_path", default= "models/distracted_driver_detector_v5") 
     parser.add_argument("--folder", default=None)
     parser.add_argument("--camera", default=None, type= int)
     parser.add_argument("--image", default=None)
@@ -39,9 +39,9 @@ if __name__ == "__main__":
             tic = time.time()
             ret, frame = cap.read()
             if ret == True:
-                frame_resized = cv2.resize(frame, (input_shape[0], input_shape[1]))
+                frame_resized = cv2.resize(frame, input_shape)
                 frame_resized_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
-                input = frame_resized_rgb.reshape(1, input_shape[0], input_shape[1], 3)
+                input = frame_resized_rgb[np.newaxis, :]
                 predictions = model.predict(input)
                 pred_label = np.argmax(predictions)
 
@@ -57,9 +57,9 @@ if __name__ == "__main__":
     elif not args.image == None:
         frame = cv2.imread(args.image)
         tic = time.time()
-        frame_resized = cv2.resize(frame, (input_shape[0], input_shape[1]))
+        frame_resized = cv2.resize(frame, input_shape)
         frame_resized_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
-        input = frame_resized_rgb.reshape(1, input_shape[0], input_shape[1], 3)
+        input = frame_resized_rgb[np.newaxis, :]
         predictions = model.predict(input)
         print(predictions)
         pred_label = np.argmax(predictions)
