@@ -15,16 +15,16 @@ def load_data(directory, input_shape, batch_size, color_mode = "rgb", class_name
             
     """
 
-    return tf.keras.preprocessing.image_dataset_from_directory(
-        directory,
-        labels="inferred",
-        label_mode="int",
-        class_names=None,
-        color_mode= "rgb",
-        batch_size= batch_size,
-        image_size= (input_shape[0], input_shape[1]),
-        shuffle= True,
-    )
+    # return tf.keras.preprocessing.image_dataset_from_directory(
+    #     directory,
+    #     labels="inferred",
+    #     label_mode="int",
+    #     class_names=None,
+    #     color_mode= "rgb",
+    #     batch_size= batch_size,
+    #     image_size= (input_shape[0], input_shape[1]),
+    #     shuffle= True,
+    # )
 
     image_generator = tf.keras.preprocessing.image.ImageDataGenerator(validation_split=0.2)    
 
@@ -32,13 +32,16 @@ def load_data(directory, input_shape, batch_size, color_mode = "rgb", class_name
                                                     directory=directory,
                                                     shuffle=True,
                                                     target_size=(input_shape[0], input_shape[1]), 
-                                                    subset="training",
-                                                    class_mode='sparse')
+                                                    subset= 'training',
+                                                    class_mode='sparse',
+                                                    color_mode= 'rgb')
 
     validation_dataset = image_generator.flow_from_directory(batch_size=batch_size,
                                                     directory=directory,
                                                     shuffle=True,
                                                     target_size=(input_shape[0], input_shape[1]), 
                                                     subset="validation",
-                                                    class_mode='sparse')
+                                                    class_mode='sparse',
+                                                    color_mode= 'rgb')
+                                                    
     return training_dataset, validation_dataset

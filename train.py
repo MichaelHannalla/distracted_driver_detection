@@ -10,7 +10,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_path", default= "state-farm-distracted-driver-detection/imgs/train/") 
     parser.add_argument("--model_save_path", default= "models/")
     parser.add_argument("--batch_size", default=4, type= int)
-    parser.add_argument("--epochs", default=5, type= int)
+    parser.add_argument("--epochs", default=100, type= int)
     args = parser.parse_args()
 
     # Load the dataset
@@ -19,11 +19,11 @@ if __name__ == "__main__":
     class_names = ["c0 Safe driving", "c1 Texting (right hand)", "c2 Talking on the phone (right hand)", "c3 Texting (left hand)",
         "c4 Talking on the phone (left hand)", "c5 Operating the radio", "c6 Drinking", "c7 Reaching behind", "c8 Hair and makeup", 
         "c9 Talking to passenger(s)"]       # List of class names
-    state_farm_trainset = load_data(args.dataset_path, input_shape= input_shape, batch_size= batch_size)
+    state_farm_trainset, state_farm_valset = load_data(args.dataset_path, input_shape= input_shape, batch_size= batch_size)
 
     # Create an instance of our model and print the summary
     distracted_driver_detector = DistractedDriverDetector()
-    distracted_driver_detector.set_dataset(state_farm_trainset,validation_dataset= None, input_shape= input_shape, batch_size= batch_size, num_classes= len(class_names))    
+    distracted_driver_detector.set_dataset(state_farm_trainset, validation_dataset= state_farm_valset, input_shape= input_shape, batch_size= batch_size, num_classes= len(class_names))    
     distracted_driver_detector.create_model()
     distracted_driver_detector.summary() 
     
@@ -34,5 +34,5 @@ if __name__ == "__main__":
     distracted_driver_detector.save_model(args.model_save_path)     
 
     # Show the performance curves 
-    plot_metrics(history)
+    #plot_metrics(history)
 
